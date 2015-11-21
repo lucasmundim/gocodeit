@@ -1,46 +1,55 @@
 package main
 
 import (
-	"fmt"
 	"os"
-	"path/filepath"
+
+	"github.com/codegangsta/cli"
 )
 
 func main() {
-	operation, err := operationFromCommandLine()
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	} else {
-		project := projectName()
-		paths := getLibPath()
-		switch operation {
-		case "set":
-			set(paths, project)
-		case "show":
-			show(paths, project)
-		case "status":
-			status(paths, project)
-		case "reset":
-			reset(project)
-		case "unset":
-			unset(paths, project)
-		default:
-			fmt.Println("Invalid operation")
-			os.Exit(1)
-		}
-	}
-}
+	project := projectName()
+	paths := getLibPath()
 
-func operationFromCommandLine() (operation string, err error) {
-	if len(os.Args) == 1 ||
-		(len(os.Args) > 1 &&
-			(os.Args[1] == "-h" || os.Args[1] == "--help" || os.Args[1] == "help")) {
-		err = fmt.Errorf("usage: %s set|show|status|reset|unset", filepath.Base(os.Args[0]))
-		return "", err
+	app := cli.NewApp()
+	app.Name = "gocodeit"
+	app.Usage = "Utility to manage gocode's lib-path when using GO15VENDOREXPERIMENT"
+	app.EnableBashCompletion = true
+	app.Commands = []cli.Command{
+		{
+			Name:  "set",
+			Usage: "Add current project's vendor to gocode's lib-path",
+			Action: func(c *cli.Context) {
+				set(paths, project)
+			},
+		},
+		{
+			Name:  "show",
+			Usage: "print some info from the current environment",
+			Action: func(c *cli.Context) {
+				show(paths, project)
+			},
+		},
+		{
+			Name:  "status",
+			Usage: "check if the current project's vendor is already on gocode's lib-path",
+			Action: func(c *cli.Context) {
+				status(paths, project)
+			},
+		},
+		{
+			Name:  "reset",
+			Usage: "this removes any path from gocode's lib-path and set it to only the current project's vendor",
+			Action: func(c *cli.Context) {
+				reset(project)
+			},
+		},
+		{
+			Name:  "unset",
+			Usage: "Removes current project's vendor from gocode's lib-path",
+			Action: func(c *cli.Context) {
+				unset(paths, project)
+			},
+		},
 	}
-	if len(os.Args) > 1 {
-		operation = os.Args[1]
-	}
-	return operation, nil
+	app.Run(os.Args)
 }

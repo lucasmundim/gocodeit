@@ -1,2 +1,4 @@
 package: github.com/lucasmundim/gocodeit
 import:
+  - package: github.com/codegangsta/cli
+    version: ^1.2.0
