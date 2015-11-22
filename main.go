@@ -7,6 +7,7 @@ import (
 )
 
 func main() {
+	runner = RealRunner{}
 	project := projectName()
 	paths := getLibPath()
 

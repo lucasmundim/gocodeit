@@ -3,24 +3,23 @@ package main
 import (
 	"fmt"
 	"os"
-	"os/exec"
 	"regexp"
 	"strings"
 )
 
 func projectName() string {
-	output, err := exec.Command("glide", "name").Output()
+	output, err := runner.Run("glide", "name")
 	if err != nil {
-		fmt.Println(err)
+		fmt.Println("Error while executing 'glide name':", err)
 		os.Exit(1)
 	}
 	return strings.TrimSpace(string(output))
 }
 
 func getLibPath() []string {
-	output, err := exec.Command("gocode", "set", "lib-path").Output()
+	output, err := runner.Run("gocode", "set", "lib-path")
 	if err != nil {
-		fmt.Println(err)
+		fmt.Println("Error while executing 'gocode set lib-path':", err)
 		os.Exit(1)
 	}
 	r := regexp.MustCompile("lib-path \"(.*)\"")
@@ -32,7 +31,7 @@ func getLibPath() []string {
 }
 
 func setLibPath(paths []string) {
-	_, err := exec.Command("gocode", "set", "lib-path", strings.Join(paths, ":")).Output()
+	_, err := runner.Run("gocode", "set", "lib-path", strings.Join(paths, ":"))
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
